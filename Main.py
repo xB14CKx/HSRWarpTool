@@ -1,4 +1,20 @@
 import customtkinter
+import os
+import sys
+
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+# Set up the icon
+icon_path = resource_path("HSR_Kafka_Icon.ico")
+
 
 def center_window(main_window):
     window_width = 1000
@@ -11,11 +27,16 @@ def center_window(main_window):
 
     main_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
+
 class mainUI:
     def setupUI(self, main_window):
         main_window.title("HSR Warp Calculator")
         main_window.geometry("1000x500")
-        main_window.resizable(width=0, height=0)
+
+        try:
+            main_window.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Warning: Could not load icon. Error: {e}")
 
         self.dashboard = customtkinter.CTkFrame(main_window, width=300, height=450, corner_radius=10)
         self.dashboard.place(x=10, y=10)
@@ -137,9 +158,15 @@ class mainUI:
                                               command=self.allCalc)
         self.btnAll.place(x=540, y=200)
 
+        # Clear
+        self.btnClear = customtkinter.CTkButton(self.calculation, width=100, height=20, text="Clear All",
+                                                font=("Arial", 20), command=self.clearALl)
+        self.btnClear.place(x=10, y=400)
+
         # Output
-        self.txtDraws = customtkinter.CTkEntry(self.calculation, width=200, height=20, font=("Arial", 20))
-        self.txtDraws.place(x=120, y=250)
+        self.txtDraws = customtkinter.CTkEntry(self.calculation, width=200, height=20, font=("Arial", 30),
+                                               justify="center", state="readonly")
+        self.txtDraws.place(x=230, y=270)
 
     def num_only(self, line):
         return line.isdigit() or line == ""
@@ -164,27 +191,39 @@ class mainUI:
         stellar_jades = self.getPlaceHolder(self.lineStellarJades, 0)
         warp_passes = self.getPlaceHolder(self.lineWarpPasses, 0)
 
+        self.txtDraws.configure(state="normal")
+
         normal_draws = (stellar_jades / 160) + warp_passes
         self.txtDraws.delete(0, "end")
         self.txtDraws.insert(0, int(normal_draws))
+
+        self.txtDraws.configure(state="readonly")
 
     def normalUSCalc(self):
         stellar_jades = self.getPlaceHolder(self.lineStellarJades, 0)
         undying_starlight = self.getPlaceHolder(self.lineUndyingStarlight, 0)
         warp_passes = self.getPlaceHolder(self.lineWarpPasses, 0)
 
+        self.txtDraws.configure(state="normal")
+
         normalUSDraws = (stellar_jades / 160) + (undying_starlight / 20) + warp_passes
         self.txtDraws.delete(0, "end")
         self.txtDraws.insert(0, int(normalUSDraws))
+
+        self.txtDraws.configure(state="readonly")
 
     def normalOSCalc(self):
         stellar_jades = self.getPlaceHolder(self.lineStellarJades, 0)
         oneiric_shards = self.getPlaceHolder(self.lineOneiricShards, 0)
         warp_passes = self.getPlaceHolder(self.lineWarpPasses, 0)
 
+        self.txtDraws.configure(state="normal")
+
         normalOSDraws = (stellar_jades / 160) + (oneiric_shards / 160) + warp_passes
         self.txtDraws.delete(0, "end")
         self.txtDraws.insert(0, int(normalOSDraws))
+
+        self.txtDraws.configure(state="readonly")
 
     def allCalc(self):
         stellar_jades = self.getPlaceHolder(self.lineStellarJades, 0)
@@ -192,9 +231,30 @@ class mainUI:
         oneiric_shards = self.getPlaceHolder(self.lineOneiricShards, 0)
         warp_passes = self.getPlaceHolder(self.lineWarpPasses, 0)
 
+        self.txtDraws.configure(state="normal")
+
         allDraws = (stellar_jades / 160) + (undying_starlight / 20) + (oneiric_shards / 160) + warp_passes
         self.txtDraws.delete(0, "end")
         self.txtDraws.insert(0, int(allDraws))
+
+        self.txtDraws.configure(state="readonly")
+
+    def clearALl(self):
+        self.lineStellarJades.delete(0, "end")
+        self.lineStellarJades.configure(placeholder_text="0")
+
+        self.lineUndyingStarlight.delete(0, "end")
+        self.lineUndyingStarlight.configure(placeholder_text="0")
+
+        self.lineOneiricShards.delete(0, "end")
+        self.lineOneiricShards.configure(placeholder_text="0")
+
+        self.lineWarpPasses.delete(0, "end")
+        self.lineWarpPasses.configure(placeholder_text="0")
+
+        self.txtDraws.configure(state="normal")
+        self.txtDraws.delete(0, "end")
+        self.txtDraws.configure(state="readonly")
 
 
 if __name__ == "__main__":
